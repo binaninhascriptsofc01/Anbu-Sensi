@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ANBU SENSI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+        }
+
+        input, select, button {
+            width: 90%;
+            padding: 12px;
+            margin: 12px 0;
+            font-size: 16px;
+            border-radius: 6px;
+            border: none;
+            background-color: #1a1a1a;
+            color: white;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        button {
+            cursor: pointer;
+            margin-top: 16px;
+            background-color: #ff0000;
+            color: white;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .gerador p {
+            margin: 10px 0;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .auxilio {
+            color: red;
+            margin-top: 20px;
+            line-height: 1.4;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .login-save {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Tela de login -->
+        <div id="loginScreen">
+            <h1>ANBU SENSI</h1>
+            <input type="text" id="username" placeholder="Usuário">
+            <input type="password" id="password" placeholder="Senha">
+            
+            <div class="login-save">
+                <input type="checkbox" id="saveLogin">
+                <label for="saveLogin">Salvar login</label>
+            </div>
+
+            <button onclick="login()">Entrar</button>
+        </div>
+
+        <!-- Tela do gerador -->
+        <div id="geradorScreen" class="hidden">
+            <h2>Gerador ANBU SENSI</h2>
+
+            <!-- Marca -->
+            <select id="marca">
+                <option>Android</option>
+                <option>iPhone</option>
+                <option>Samsung</option>
+                <option>Xiaomi</option>
+                <option>Outras</option>
+            </select>
+
+            <!-- Modelo -->
+            <input type="text" id="modelo" placeholder="Digite o modelo do telefone">
+            <button onclick="gerarSensi()">Gerar Sensi</button>
+
+            <!-- Resultados do gerador -->
+            <div class="gerador hidden" id="sensiConfig">
+                <p>Marca: <span id="resMarca"></span></p>
+                <p>Modelo: <span id="resModelo"></span></p>
+                <p>Sensi: <span id="resSensi"></span></p>
+                <p>DPI: <span id="resDPI"></span></p>
+                <p>Botão de Atirar: <span id="resBotao"></span></p>
+                <p>Geral: <span id="resGeral"></span></p>
+                <p>Ponto Vermelho: <span id="resPonto"></span></p>
+                <p>Mira 2x: <span id="res2x"></span></p>
+                <p>Mira 4x: <span id="res4x"></span></p>
+                <p>Olhadinha: <span id="resOlhadinha"></span></p>
+                <p>Mira AWM: <span id="resAWM"></span></p>
+            </div>
+
+            <!-- Auxílio sempre visível -->
+            <div class="auxilio">
+                Auxílio: se a sensi não estiver boa, diminua o botão ou o geral; se estiver grudando no peito, aumente 3 no geral; se estiver passando da cabeça, diminua 3 no geral.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar se login foi salvo
+        window.onload = () => {
+            const savedUser = localStorage.getItem('savedUser');
+            const savedPass = localStorage.getItem('savedPass');
+            if(savedUser && savedPass) {
+                document.getElementById('username').value = savedUser;
+                document.getElementById('password').value = savedPass;
+                document.getElementById('saveLogin').checked = true;
+            }
+        }
+
+        function login() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const save = document.getElementById('saveLogin').checked;
+
+            if(user === "Sensi" && pass === "Pro") {
+                if(save) {
+                    localStorage.setItem('savedUser', user);
+                    localStorage.setItem('savedPass', pass);
+                } else {
+                    localStorage.removeItem('savedUser');
+                    localStorage.removeItem('savedPass');
+                }
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('geradorScreen').classList.remove('hidden');
+            } else {
+                alert("Usuário ou senha incorretos!");
+            }
+        }
+
+        function gerarSensi() {
+            const marca = document.getElementById('marca').value;
+            let modelo = document.getElementById('modelo').value.trim();
+            if(!modelo) {
+                alert("Digite o modelo do telefone!");
+                return;
+            }
+
+            modelo = modelo.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+            
+            document.getElementById('resMarca').innerText = marca;
+            document.getElementById('resModelo').innerText = modelo;
+
+            const sensi = (Math.random() * (200-50) + 50).toFixed(1);
+            document.getElementById('resSensi').innerText = sensi;
+
+            const dpi = marca === "iPhone" ? "N/A" : Math.floor(Math.random() * (900-400+1) + 400);
+            document.getElementById('resDPI').innerText = dpi;
+
+            const botao = Math.floor(Math.random() * (70-10+1) + 10);
+            document.getElementById('resBotao').innerText = botao;
+
+            document.getElementById('resGeral').innerText = Math.floor(Math.random()*200);
+            document.getElementById('resPonto').innerText = Math.floor(Math.random()*200);
+            document.getElementById('res2x').innerText = Math.floor(Math.random()*200);
+            document.getElementById('res4x').innerText = Math.floor(Math.random()*200);
+            document.getElementById('resOlhadinha').innerText = Math.floor(Math.random()*200);
+            document.getElementById('resAWM').innerText = Math.floor(Math.random()*200);
+
+            document.getElementById('sensiConfig').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
