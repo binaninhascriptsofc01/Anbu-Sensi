@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>ANBU SENSI</title>
+<style>
+body { font-family: Arial, sans-serif; background-color:#111; color:white; text-align:center; margin:0; padding:0; }
+h1,h2,h3 { color:#ff0000; text-shadow:0 0 5px #ff0000,0 0 10px #ff3333,0 0 20px #ff6666; }
+input,select,button { padding:10px; margin:10px; border-radius:5px; border:none; font-size:16px; }
+button { background-color:#ff0000; color:white; cursor:pointer; transition:0.2s; }
+button:hover { background-color:#ff5555; transform:scale(1.05); }
+.card { background-color:#222; padding:20px; border-radius:10px; display:inline-block; margin-top:50px; box-shadow:0 0 20px #ff0000,0 0 40px #ff3333,0 0 60px #ff6666; transition:0.3s; }
+.card:hover { box-shadow:0 0 30px #ff0000,0 0 60px #ff3333,0 0 90px #ff6666; }
+.auxilio { color:#ff0000; margin-top:20px; text-align:left; max-width:400px; margin-left:auto; margin-right:auto; }
+.hidden { display:none; }
+#resultado { margin-top:20px; text-align:left; }
+</style>
+</head>
+<body>
+
+<!-- Tela de Login -->
+<div class="card" id="loginCard">
+    <h1>ANBU SENSI</h1>
+    <h2>Login</h2>
+    <input type="text" id="usuarioInput" placeholder="Usuário">
+    <br>
+    <input type="password" id="senhaInput" placeholder="Senha">
+    <br>
+    <input type="checkbox" id="lembrarLogin"> Salvar login
+    <br>
+    <button onclick="verificarLogin()">Entrar</button>
+</div>
+
+<script>
+const USUARIO_CORRETO = "Sensi";
+const SENHA_CORRETA = "Pro";
+
+// Capitaliza modelo
+function capitalizarModelo(texto){
+    return texto.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
+}
+
+// Gera sensi funcional
+function gerarSensiFuncional(marca){
+    let base = Math.floor(Math.random()*30)+140; 
+    let ajuste = 0;
+    switch(marca){
+        case 'iPhone': ajuste=-5; break;
+        case 'Xiaomi': ajuste=3; break;
+        case 'Samsung': ajuste=0; break;
+        case 'Motorola': ajuste=2; break;
+        default: ajuste=0;
+    }
+    let dpiVal = marca==='iPhone'? '-' : Math.floor(Math.random()*501)+400; 
+    let geral = base + ajuste;
+    let botaoVal = Math.min(70, Math.max(10, Math.floor((geral-140)/30*60 +10)));
+    return {
+        dpi: dpiVal,
+        botao: botaoVal,
+        geral: geral,
+        pontoVermelho: base - 15 + ajuste,
+        mira2x: base - 10 + ajuste,
+        mira4x: base - 12 + ajuste,
+        olhadinha: base - 18 + ajuste,
+        miraAWM: base + 5 + ajuste
+    };
+}
+
+// Mostra gerador
+function mostrarGerador(){
+    if(document.getElementById('geradorCard')) return; // não cria duas vezes
+    const geradorHTML = document.createElement('div');
+    geradorHTML.className = 'card';
+    geradorHTML.id = 'geradorCard';
+    geradorHTML.innerHTML = `
+        <h1>Gerador de Sensi</h1>
+        <select id="marcaSelect">
+            <option value="Android">Android</option>
+            <option value="iPhone">iPhone</option>
+            <option value="Xiaomi">Xiaomi</option>
+            <option value="Samsung">Samsung</option>
+            <option value="Motorola">Motorola</option>
+            <option value="Outros">Outros</option>
+        </select>
+        <br>
+        <input type="text" id="modeloInput" placeholder="Modelo do telefone">
+        <br>
+        <button onclick="gerarSensi()">Gerar Sensi</button>
+        <div id="resultado" class="hidden"></div>
+        <div class="auxilio">
+            <h2>Auxílio</h2>
+            <p>Se a sensi estiver grudando no peito, aumente Geral +5.<br>
+            Se passar da cabeça, diminua Geral -5.<br>
+            Se continuar o problema, diminua Botão -5.<br>
+            Se ainda grudando no peito, aumente Geral +5.</p>
+            <p>sofrerá atualizações ao decorrer do ano</p>
+        </div>
+    `;
+    document.body.appendChild(geradorHTML);
+}
+
+// Verifica login
+function verificarLogin(){
+    const usuario = document.getElementById('usuarioInput').value.trim();
+    const senha = document.getElementById('senhaInput').value.trim();
+    const lembrar = document.getElementById('lembrarLogin').checked;
+
+    if(usuario===USUARIO_CORRETO && senha===SENHA_CORRETA){
+        document.getElementById('loginCard').remove();
+        if(lembrar){
+            localStorage.setItem('usuarioSalvo', usuario);
+            localStorage.setItem('senhaSalva', senha);
+        } else {
+            localStorage.removeItem('usuarioSalvo');
+            localStorage.removeItem('senhaSalva');
+        }
+        mostrarGerador();
+    } else {
+        alert("Usuário ou senha incorretos!");
+    }
+}
+
+// Gera sensi
+function gerarSensi(){
+    const marca = document.getElementById('marcaSelect').value;
+    const modeloRaw = document.getElementById('modeloInput').value.trim();
+    if(!modeloRaw){ alert('Digite o modelo do telefone'); return; }
+    const modelo = capitalizarModelo(modeloRaw);
+    document.getElementById('modeloInput').value = modelo;
+    const s = gerarSensiFuncional(marca);
+
+    const resultado = document.getElementById('resultado');
+    resultado.innerHTML = `
+        <h2>${marca}</h2>
+        <h3>${modelo}</h3>
+        DPI: ${s.dpi}<br>
+        Botão de Atirar: ${s.botao}<br>
+        Geral: ${s.geral}<br>
+        Ponto Vermelho: ${s.pontoVermelho}<br>
+        Mira 2x: ${s.mira2x}<br>
+        Mira 4x: ${s.mira4x}<br>
+        Olhadinha: ${s.olhadinha}<br>
+        Mira AWM: ${s.miraAWM}
+    `;
+    resultado.classList.remove('hidden');
+}
+
+// Onload checa login salvo
+window.onload = function(){
+    const usuarioSalvo = localStorage.getItem('usuarioSalvo');
+    const senhaSalva = localStorage.getItem('senhaSalva');
+    if(usuarioSalvo===USUARIO_CORRETO && senhaSalva===SENHA_CORRETA){
+        document.getElementById('loginCard').remove();
+        mostrarGerador();
+    }
+}
+</script>
+</body>
+</html>
